@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { fetchTasks } from './src/api/tasks';
@@ -28,13 +28,13 @@ export default function App() {
     setNewTitle('');
   }
 
-  function toggleTask(id) {
-    setTasks(tasks.map((t) => (t.id === id ? { ...t, done: !t.done } : t)));
-  }
+  const toggleTask = useCallback((id) => {
+    setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t)));
+  }, []);
 
-  function deleteTask(id) {
-    setTasks(tasks.filter((t) => t.id !== id));
-  }
+  const deleteTask = useCallback((id) => {
+    setTasks((prev) => prev.filter((t) => t.id !== id));
+  }, []);
 
   function clearDone() {
     setTasks(tasks.filter((t) => !t.done));
@@ -49,6 +49,7 @@ export default function App() {
       <AddTaskForm value={newTitle} onChangeText={setNewTitle} onAdd={addTask} />
       <FilterBar current={filter} onChange={setFilter} />
       {error && <Text style={styles.error}>Could not load tasks: {error}</Text>}
+
       <FlatList
         data={visibleTasks}
         keyExtractor={(item) => String(item.id)}
